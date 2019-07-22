@@ -5,3 +5,4 @@ authors = ["Carter Green <cartergr@usc.edu>"]
 edition = "2018"
 
 [dependencies]
+dirs = "1.0"
