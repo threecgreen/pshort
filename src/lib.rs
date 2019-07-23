@@ -1,4 +1,4 @@
-extern crate dirs;
+use dirs;
 
 pub fn replace_home(path: &str) -> String {
     let home_dir_path = dirs::home_dir();
@@ -7,10 +7,10 @@ pub fn replace_home(path: &str) -> String {
     }
     let home_dir_path_uw = home_dir_path.unwrap();
     let home_dir = home_dir_path_uw.to_str().unwrap_or("");
-    return match path.get(..home_dir.len()) {
+    match path.get(..home_dir.len()) {
         Some(sub_path) if sub_path == home_dir => format!("~{}", path.get(home_dir.len()..path.len()).unwrap_or("")),
         _ => path.to_owned(),
-    };
+    }
 }
 
 pub fn truncate_path(path: &str, target_len: usize, trunc_len: usize) -> String {
@@ -43,7 +43,7 @@ pub fn truncate_path(path: &str, target_len: usize, trunc_len: usize) -> String 
             out.push('/');
         }
     }
-    return out;
+    out
 }
 
 #[cfg(test)]
