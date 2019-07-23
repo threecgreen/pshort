@@ -28,7 +28,12 @@ pub fn truncate_path(path: &str, target_len: usize, trunc_len: usize) -> String 
             out.push_str(dir);
             out.push('/');
         } else {
-            match dir.get(..trunc_len) {
+            // Include one more character for hidden directories (those starting with '.')
+            let adj_trunc_len = match dir.get(..1) {
+                Some(l) if l == "." => trunc_len + 1,
+                _ => trunc_len,
+            };
+            match dir.get(..adj_trunc_len) {
                 Some(t_dir) => {
                     out.push_str(t_dir);
                     out_len -= dir.len() - trunc_len;
@@ -79,5 +84,10 @@ mod tests {
     #[test]
     fn test_different_trunc_len() {
         assert_eq!(truncate_path("~/git/vinoteca/vinoteca/node_modules", 1, 2), "~/gi/vi/vi/node_modules");
+    }
+
+    #[test]
+    fn test_private_dirs_get_extra_letter() {
+        assert_eq!(truncate_path("~/.config/i3", 1, 1), "~/.c/i3");
     }
 }
