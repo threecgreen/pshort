@@ -90,4 +90,9 @@ mod tests {
     fn test_private_dirs_get_extra_letter() {
         assert_eq!(truncate_path("~/.config/i3", 1, 1), "~/.c/i3");
     }
+
+    #[test]
+    fn test_unicode() {
+        assert_eq!(truncate_path("~/españa/Δελτα/française", 1, 1), "~/e/Δ/française");
+    }
 }
