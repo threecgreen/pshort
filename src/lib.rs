@@ -8,7 +8,9 @@ pub fn replace_home(path: &str) -> String {
     let home_dir_path_uw = home_dir_path.unwrap();
     let home_dir = home_dir_path_uw.to_str().unwrap_or("");
     match path.get(..home_dir.len()) {
-        Some(sub_path) if sub_path == home_dir => format!("~{}", path.get(home_dir.len()..path.len()).unwrap_or("")),
+        Some(sub_path) if sub_path == home_dir => {
+            format!("~{}", path.get(home_dir.len()..path.len()).unwrap_or(""))
+        }
         _ => path.to_owned(),
     }
 }
@@ -37,7 +39,7 @@ pub fn truncate_path(path: &str, target_len: usize, trunc_len: usize) -> String 
                 Some(t_dir) => {
                     out.push_str(t_dir);
                     out_len -= dir.len() - trunc_len;
-                },
+                }
                 None => out.push_str(dir),
             };
             out.push('/');
@@ -52,18 +54,29 @@ mod tests {
 
     #[test]
     fn test_replace_home() {
-        assert_eq!(replace_home(&format!("{}/git/vinoteca/vinoteca/node_modules", dirs::home_dir().unwrap().to_str().unwrap_or(""))),
-                   "~/git/vinoteca/vinoteca/node_modules");
+        assert_eq!(
+            replace_home(&format!(
+                "{}/git/vinoteca/vinoteca/node_modules",
+                dirs::home_dir().unwrap().to_str().unwrap_or("")
+            )),
+            "~/git/vinoteca/vinoteca/node_modules"
+        );
     }
 
     #[test]
     fn test_replace_home_outside_home() {
-        assert_eq!(replace_home("/usr/lib/llvm/include"), "/usr/lib/llvm/include");
+        assert_eq!(
+            replace_home("/usr/lib/llvm/include"),
+            "/usr/lib/llvm/include"
+        );
     }
 
     #[test]
     fn test_truncated_path() {
-        assert_eq!(truncate_path("/usr/lib/llvm/include", 1, 1), "/u/l/l/include");
+        assert_eq!(
+            truncate_path("/usr/lib/llvm/include", 1, 1),
+            "/u/l/l/include"
+        );
     }
 
     #[test]
@@ -78,12 +91,18 @@ mod tests {
 
     #[test]
     fn test_truncate_some_but_not_others() {
-        assert_eq!(truncate_path("/usr/lib/llvm/include", 18, 1), "/u/l/llvm/include");
+        assert_eq!(
+            truncate_path("/usr/lib/llvm/include", 18, 1),
+            "/u/l/llvm/include"
+        );
     }
 
     #[test]
     fn test_different_trunc_len() {
-        assert_eq!(truncate_path("~/git/vinoteca/vinoteca/node_modules", 1, 2), "~/gi/vi/vi/node_modules");
+        assert_eq!(
+            truncate_path("~/git/vinoteca/vinoteca/node_modules", 1, 2),
+            "~/gi/vi/vi/node_modules"
+        );
     }
 
     #[test]
@@ -93,6 +112,9 @@ mod tests {
 
     #[test]
     fn test_unicode() {
-        assert_eq!(truncate_path("~/españa/Δελτα/française", 1, 1), "~/e/Δ/française");
+        assert_eq!(
+            truncate_path("~/españa/Δελτα/française", 1, 1),
+            "~/e/Δ/française"
+        );
     }
 }
