@@ -15,6 +15,12 @@ pub fn replace_home(path: &str) -> String {
     }
 }
 
+/// Given a path, a target length and a truncation length, returns a truncated
+/// path.
+///
+/// `target_len` is the ideal max length of the path
+/// `trunc_len` is the how many characters to include when truncating an element
+/// of a path
 pub fn truncate_path(path: &str, target_len: usize, trunc_len: usize) -> String {
     if path.len() <= target_len {
         return path.to_owned();
@@ -25,24 +31,21 @@ pub fn truncate_path(path: &str, target_len: usize, trunc_len: usize) -> String 
     for (idx, dir) in components.iter().enumerate() {
         // Never truncate current directory
         if idx == components.len() - 1 {
-            out.push_str(dir);
+            out = format!("{}{}", out, dir);
         } else if out_len <= target_len || dir.len() <= trunc_len {
-            out.push_str(dir);
-            out.push('/');
+            out = format!("{}{}/", out, dir);
         } else {
             // Include one more character for hidden directories (those starting with '.')
-            let adj_trunc_len = match dir.get(..1) {
-                Some(l) if l == "." => trunc_len + 1,
+            let dir_chars: Vec<char> = dir.chars().collect();
+            let adj_trunc_len = match dir_chars.get(0) {
+                Some(l) if *l == '.' => trunc_len + 1,
                 _ => trunc_len,
             };
-            match dir.get(..adj_trunc_len) {
-                Some(t_dir) => {
-                    out.push_str(t_dir);
-                    out_len -= dir.len() - trunc_len;
-                }
-                None => out.push_str(dir),
+            out_len -= dir.len() - adj_trunc_len;
+            out = match dir_chars.get(..adj_trunc_len) {
+                Some(t_dir) => format!("{}{}/", out, t_dir.iter().collect::<String>()),
+                None => format!("{}{}/", out, dir),
             };
-            out.push('/');
         }
     }
     out
