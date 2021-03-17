@@ -1,3 +1,3 @@
-#!/bin/bash
+#!/bin/sh
 cargo build --release
 cp ./target/release/pshort $HOME/.local/bin
