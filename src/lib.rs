@@ -1,5 +1,3 @@
-use dirs;
-
 pub fn replace_home(path: &str) -> String {
     let home_dir_path = dirs::home_dir();
     if home_dir_path.is_none() {
@@ -25,27 +23,28 @@ pub fn truncate_path(path: &str, target_len: usize, trunc_len: usize) -> String 
     if path.len() <= target_len {
         return path.to_owned();
     }
-    let mut out = "".to_owned();
-    let mut out_len = path.len();
-    let components = path.split('/').collect::<Vec<&str>>();
-    for (idx, dir) in components.iter().enumerate() {
+    let mut out_char_count = path.chars().count();
+    // Preallocate `out_len` in case truncation is not possible
+    let mut out = String::with_capacity(path.len());
+
+    let mut components = path.split('/').peekable();
+    while let Some(dir) = components.next() {
         // Never truncate current directory
-        if idx == components.len() - 1 {
-            out = format!("{}{}", out, dir);
-        } else if out_len <= target_len || dir.len() <= trunc_len {
-            out = format!("{}{}/", out, dir);
+        if components.peek().is_none() {
+            out.push_str(dir);
+        // No truncation necessary or possible
+        } else if out_char_count <= target_len || dir.len() <= trunc_len {
+            out.push_str(dir);
+            out.push('/');
+        // Truncate
         } else {
-            // Include one more character for hidden directories (those starting with '.')
-            let dir_chars: Vec<char> = dir.chars().collect();
-            let adj_trunc_len = match dir_chars.get(0) {
-                Some(l) if *l == '.' => trunc_len + 1,
+            let adj_trun_len = match dir.chars().next() {
+                Some('.') => trunc_len + 1,
                 _ => trunc_len,
             };
-            out_len -= dir.len() - adj_trunc_len;
-            out = match dir_chars.get(..adj_trunc_len) {
-                Some(t_dir) => format!("{}{}/", out, t_dir.iter().collect::<String>()),
-                None => format!("{}{}/", out, dir),
-            };
+            out.push_str(&dir.chars().take(adj_trun_len).collect::<String>());
+            out.push('/');
+            out_char_count -= dir.chars().count() - adj_trun_len;
         }
     }
     out
@@ -119,5 +118,6 @@ mod tests {
             truncate_path("~/españa/Δελτα/française", 1, 1),
             "~/e/Δ/française"
         );
+        assert_eq!(truncate_path("~/문서/대학", 1, 1), "~/문/대학");
     }
 }
