@@ -1,4 +1,5 @@
 # pshort: a path shortener
+![Rust](https://github.com/threecgreen/pshort/workflows/Rust/badge.svg)
 I use this as part of my shell prompt as a compromise between only printing the
 name of the current directory and displaying the whole path.
 
