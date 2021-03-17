@@ -1,7 +1,5 @@
 use std::env;
 
-use pshort;
-
 const TRUNC_LEN: usize = 1;
 const DEFAULT_TARGET_LEN: usize = 18;
 
